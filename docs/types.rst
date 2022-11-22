@@ -2,21 +2,22 @@
 
 .. _types:
 
-*****
-Types
-*****
+****
+Typy
+****
 
-Solidity is a statically typed language, which means that the type of each
-variable (state and local) needs to be specified.
-Solidity provides several elementary types which can be combined to form complex types.
+Solidity to język statycznie typowany, co znaczy, że należy określić typ
+każdej zmiennej (zarówno zmiennych stanu, jak i lokalnych).
+Istnieje kilka podstawowych typów, które można łączyć, aby utworzyć typ złożony.
 
-In addition, types can interact with each other in expressions containing
-operators. For a quick reference of the various operators, see :ref:`order`.
+Dodatkowo typy mogą oddziaływać ze sobą w wyrażeniach zawierających operatory.
+Aby poznać różne operatory, przeczytaj :ref:`order`.
 
-The concept of "undefined" or "null" values does not exist in Solidity, but newly
-declared variables always have a :ref:`default value<default-value>` dependent
-on its type. To handle any unexpected values, you should use the :ref:`revert function<assert-and-require>` to revert the whole transaction, or return a
-tuple with a second ``bool`` value denoting success.
+Pojęcia "undefined" oraz "null" nie istnieją w Solidity. Nowo zadeklarowane
+zmienne zawsze mają :ref:`domyślne wartości<default-value>` w zależności
+od ich typu. Aby obsłużyć nieoczekiwane wartości, powinieneś użyć 
+:ref:`funkcji revert<assert-and-require>`, aby wycofać całą transakcję
+lub zwrócić krotkę z drugą wartością typu ``bool`` oznaczającą sukces.
 
 .. include:: types/value-types.rst
 

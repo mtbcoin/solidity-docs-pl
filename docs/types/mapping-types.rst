@@ -1,44 +1,42 @@
 .. index:: !mapping
 .. _mapping-types:
 
-Mapping Types
-=============
+Mapy
+====
 
-Mapping types use the syntax ``mapping(KeyType => ValueType)`` and variables
-of mapping type are declared using the syntax ``mapping(KeyType => ValueType) VariableName``.
-The ``KeyType`` can be any
-built-in value type, ``bytes``, ``string``, or any contract or enum type. Other user-defined
-or complex types, such as mappings, structs or array types are not allowed.
-``ValueType`` can be any type, including mappings, arrays and structs.
+Mapy tworzy się za pomocą składni ``mapping(KeyType => ValueType)``, a zmienne typu mapa
+deklaruje się przy użyciu ``mapping(KeyType => ValueType) VariableName``.
+``KeyType`` może być dowolnym wbuowanym typem: ``bytes``, ``string``, kontraktem lub wyliczeniem enum. Typy zdefiniowane przez użytkownika lub typy złożone, takie jak mapy, struktury lub tablice, są niedozwolone.
+``ValueType`` może być dowolnego typu, wliczając mapy, tablice i struktury.
 
-You can think of mappings as `hash tables <https://en.wikipedia.org/wiki/Hash_table>`_, which are virtually initialised
-such that every possible key exists and is mapped to a value whose
-byte-representation is all zeros, a type's :ref:`default value <default-value>`.
-The similarity ends there, the key data is not stored in a
-mapping, only its ``keccak256`` hash is used to look up the value.
+Możesz myśleć o mapach jak o `tablicach mieszających <https://pl.wikipedia.org/wiki/Tablica_mieszaj%C4%85ca>`_,
+które są wirtualnie inicjowane tak, że każdy możliwy klucz istnieje
+i jest do niego przypisana :ref:`wartość domyślna <default-value>`,
+w reprezentacji bajtowej złożona z samych zer.
+Dane klucza nie są przechowywane w mapie, a jedynie jego skrót 
+``keccak256`` jest używany do wyszukania wartości.
 
-Because of this, mappings do not have a length or a concept of a key or
-value being set, and therefore cannot be erased without extra information
-regarding the assigned keys (see :ref:`clearing-mappings`).
+Dlatego mapy nie mają określonej długości i nie istnieje pojęcie dodawania klucza
+ani wartości. Z tego powodu nie można ich wyczyścić bez podania dodatkowych informacji
+dotyczących przypisanych kluczy (zobacz :ref:`czyszczenie map<clearing-mappings>`).
 
-Mappings can only have a data location of ``storage`` and thus
-are allowed for state variables, as storage reference types
-in functions, or as parameters for library functions.
-They cannot be used as parameters or return parameters
-of contract functions that are publicly visible.
-These restrictions are also true for arrays and structs that contain mappings.
+Mapy mogą zawierać jedynie położenie danych w ``magazynie<storage>``i tym samym
+można ich użyć w zmiennych stanu jako typów referencji do magazynu, w funkcjach
+oraz jako parametrów funkcji bibliotecznych.
+Nie można ich używać jako argumentów ani parametrów zwracanych
+w funkcjach kontraktów, które są widoczne publicznie.
+Te ograniczenia dotyczą także tablic i struktur zawierających mapy.
 
-You can mark state variables of mapping type as ``public`` and Solidity creates a
-:ref:`getter <visibility-and-getters>` for you. The ``KeyType`` becomes a parameter for the getter.
-If ``ValueType`` is a value type or a struct, the getter returns ``ValueType``.
-If ``ValueType`` is an array or a mapping, the getter has one parameter for
-each ``KeyType``, recursively.
+Możesz oznaczyć zmienne stanu typu mapa jako ``public``. Wtedy Solidity automatycznie utworzy
+:ref:`getter <visibility-and-getters>`. Parametrem gettera będzie ``KeyType``.
+Jeśli ``ValueType`` jest typem wartości lub strukturą, getter zwraca ``ValueType``.
+Jeśli ``ValueType`` jest tablicą lub mapą, getter ma jeden parametr dla każdego ``KeyType``, rekurencyjnie.
 
-In the example below, the ``MappingExample`` contract defines a public ``balances``
-mapping, with the key type an ``address``, and a value type a ``uint``, mapping
-an Ethereum address to an unsigned integer value. As ``uint`` is a value type, the getter
-returns a value that matches the type, which you can see in the ``MappingUser``
-contract that returns the value at the specified address.
+W poniższym przykładzie kontrakt ``MappingExample`` definiuje publiczną mapę ``balances``
+z typem kluczy ``address`` i typem wartości ``uint``, przypisującą adresy Ethereum do
+liczby całkowitej bez znaku. Ponieważ ``uint`` jest typem wartości, getter zwraca wartość
+odpowiadającą typowi, jaki możes zobaczyć w kontrkacie ``MappingUser`` który zwraca kwotę
+pod określonym adresem.
 
 .. code-block:: solidity
 
@@ -61,10 +59,10 @@ contract that returns the value at the specified address.
         }
     }
 
-The example below is a simplified version of an
-`ERC20 token <https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol>`_.
-``_allowances`` is an example of a mapping type inside another mapping type.
-The example below uses ``_allowances`` to record the amount someone else is allowed to withdraw from your account.
+Poniższy przykład jest uproszczoną wersją
+`tokenu ERC20 <https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol>`_.
+``_allowances`` to przykład, jak umieścić mapę wewnątrz innej mapy.
+Zmienna ``_allowances`` przechowuje kwotę, jaką inne osoby mogą wypłacić z twojego konta.
 
 .. code-block:: solidity
 
@@ -113,14 +111,14 @@ The example below uses ``_allowances`` to record the amount someone else is allo
 .. index:: !iterable mappings
 .. _iterable-mappings:
 
-Iterable Mappings
------------------
+Iterowalne mapy
+---------------
 
-You cannot iterate over mappings, i.e. you cannot enumerate their keys.
-It is possible, though, to implement a data structure on
-top of them and iterate over that. For example, the code below implements an
-``IterableMapping`` library that the ``User`` contract then adds data to, and
-the ``sum`` function iterates over to sum all the values.
+Nie możesz iterować po mapach, tzn. nie możesz wyliczyć ich kluczy.
+Natomiast można na ich bazie stworzyć osobną strukturę danych i po
+niej iterować. Poniższy kod tworzy bibliotekę ``IterableMapping``.
+Kontrakt ``User`` dodaje elementy do struktury, zaś funkcja ``sum`` 
+iteruje po niej i sumuje wszystkie kwoty.
 
 .. code-block:: solidity
     :force:
@@ -193,23 +191,23 @@ the ``sum`` function iterates over to sum all the values.
         }
     }
 
-    // How to use it
+    // Jak tego użyć
     contract User {
-        // Just a struct holding our data.
+        // Struktura przechowujaca nasze dane.
         itmap data;
-        // Apply library functions to the data type.
+        // Stosuje funkcje biblioteczne do tego typu danych.
         using IterableMapping for itmap;
 
-        // Insert something
+        // Wstaw coś.
         function insert(uint k, uint v) public returns (uint size) {
-            // This calls IterableMapping.insert(data, k, v)
+            // Wywołuje IterableMapping.insert(data, k, v)
             data.insert(k, v);
-            // We can still access members of the struct,
-            // but we should take care not to mess with them.
+            // Wciąż mamy dostęp do pól struktury, ale nie
+            // powinniśmy odwoływać się do nich bez potrzeby.
             return data.size;
         }
 
-        // Computes the sum of all stored data.
+        // Oblicza sumę wszystkich przechowywanych wartości.
         function sum() public view returns (uint s) {
             for (
                 Iterator i = data.iterateStart();

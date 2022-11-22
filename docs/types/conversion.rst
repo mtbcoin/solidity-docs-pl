@@ -2,35 +2,34 @@
 
 .. _types-conversion-elementary-types:
 
-Conversions between Elementary Types
+Konwersje między typami podstawowymi
 ====================================
 
-Implicit Conversions
---------------------
+Konwersje niejawne
+------------------
 
-An implicit type conversion is automatically applied by the compiler in some cases
-during assignments, when passing arguments to functions and when applying operators.
-In general, an implicit conversion between value-types is possible if it makes
-sense semantically and no information is lost.
+Kompilator w niektórych przypadkach dokonuje niejawnej konwersji typów - podczas
+przypisań, przekazywania argumentów do funkcji i stosowania operatorów.
+Zasadniczo niejawna konwersja między typami podstawowymi jest możliwa,
+jeśli ma ona sens znaczeniowo i żadne informacje nie zostaną utracone.
 
-For example, ``uint8`` is convertible to
-``uint16`` and ``int128`` to ``int256``, but ``int8`` is not convertible to ``uint256``,
-because ``uint256`` cannot hold values such as ``-1``.
+Na przykład ``uint8`` da się skonwertować do ``uint16``, zaś ``int128``
+do ``int256``, ale ``int8`` nie da się skonwertować do ``uint256``,
+ponieważ ``uint256`` nie może przechowywać wartości takich jak ``-1``.
 
-If an operator is applied to different types, the compiler tries to implicitly
-convert one of the operands to the type of the other (the same is true for assignments).
-This means that operations are always performed in the type of one of the operands.
+Jeśli stosujemy operator do odmiennych typów, kompilator próbuje niejawnie
+skonwertować jeden z operandów do typu drugiego operandu (to samo dotyczy przypisań).
+To znaczy, że operacje są zawsze wykonywane w typie jednego z tych operandów.
 
-For more details about which implicit conversions are possible,
-please consult the sections about the types themselves.
+Aby dowiedzieć się więcej, jakie niejawne konwersje są możliwe,
+przeczytaj rozdziały o poszczególnych typach danych.
 
-In the example below, ``y`` and ``z``, the operands of the addition,
-do not have the same type, but ``uint8`` can
-be implicitly converted to ``uint16`` and not vice-versa. Because of that,
-``y`` is converted to the type of ``z`` before the addition is performed
-in the ``uint16`` type. The resulting type of the expression ``y + z`` is ``uint16``.
-Because it is assigned to a variable of type ``uint32`` another implicit conversion
-is performed after the addition.
+W poniższym przykładzie ``y`` i ``z``, operandy dodawania, mają różne typy,
+ale ``uint8`` można niejawnie skonwertować do ``uint16``. Natomiast nie da
+się dokonać konwersji na odwrót. Dlatego przed wykonaniem dodawania typ ``y``
+jest konwertowany do typu ``z``. Typ wynikowy wyrażenia ``y + z`` to ``uint16``.
+Ponieważ wynik operacji przypisujemy do zmiennej typu ``uint32``,
+następuje kolejna niejawna konwersja typów.
 
 .. code-block:: solidity
 
@@ -39,79 +38,80 @@ is performed after the addition.
     uint32 x = y + z;
 
 
-Explicit Conversions
---------------------
+Konwersje jawne
+---------------
 
-If the compiler does not allow implicit conversion but you are confident a conversion will work,
-an explicit type conversion is sometimes possible. This may
-result in unexpected behaviour and allows you to bypass some security
-features of the compiler, so be sure to test that the
-result is what you want and expect!
+Jeśli kompilator nie pozwala na niejawną konwersję typów, ale jesteś pewny,
+że konwersja zadziała, możesz dokonać jawnej konwersji. Może ona zaowocować
+błędnym zachowaniem kontraktu. Pozwala też obejść niektóre mechanizmy
+bezpieczeństwa kompilatora, więc pamiętaj, aby przetestować, czy
+wynik jest zgodny z twoimi oczekiwaniami!
 
-Take the following example that converts a negative ``int`` to a ``uint``:
+Spójrz na poniższy przykład, który konwertuje negatywny ``int`` do ``uint``:
 
 .. code-block:: solidity
 
     int  y = -3;
     uint x = uint(y);
 
-At the end of this code snippet, ``x`` will have the value ``0xfffff..fd`` (64 hex
-characters), which is -3 in the two's complement representation of 256 bits.
+Pod koniec tego fragmentu kodu ``x`` będzie miał wartość ``0xfffff..fd`` (64 znaki hex), 
+co daje -3 w kodzie uzupełnień do dwóch liczby 256-bitowej.
 
-If an integer is explicitly converted to a smaller type, higher-order bits are
-cut off:
+Jeśli liczba całkowita jest jawnie konwertowana do mniejszego typu,
+najbardziej znaczące bity są obcinane:
 
 .. code-block:: solidity
 
     uint32 a = 0x12345678;
     uint16 b = uint16(a); // b will be 0x5678 now
 
-If an integer is explicitly converted to a larger type, it is padded on the left (i.e., at the higher order end).
-The result of the conversion will compare equal to the original integer:
+Jeśli liczba całkowita jest jawnie konwertowana do większego typu, to po lewej
+stronie są dodawane zera (tzn. po stronie najbardziej znaczących bitów).
+Wynik konwersji będzie równy oryginalnej liczbie całkowitej:
 
 .. code-block:: solidity
 
     uint16 a = 0x1234;
-    uint32 b = uint32(a); // b will be 0x00001234 now
+    uint32 b = uint32(a); // b będzie wynosić 0x00001234
     assert(a == b);
 
-Fixed-size bytes types behave differently during conversions. They can be thought of as
-sequences of individual bytes and converting to a smaller type will cut off the
-sequence:
+Typy bajtowe o stałym rozmiarze zachowują się inaczej podczas konwersji.
+Można o nich myśleć jak o ciągach pojedynczych bajtów i konwersja do
+mniejszego typu spowoduje obcięcie ciągu:
 
 .. code-block:: solidity
 
     bytes2 a = 0x1234;
-    bytes1 b = bytes1(a); // b will be 0x12
+    bytes1 b = bytes1(a); // b będzie zawierać 0x12
 
-If a fixed-size bytes type is explicitly converted to a larger type, it is padded on
-the right. Accessing the byte at a fixed index will result in the same value before and
-after the conversion (if the index is still in range):
+Jeśli typ bajtowy o stałym rozmiarze jest jawnie konwertowany do większego typu,
+wtedy jest dopełniany zerami po prawej stronie. Jeśli odczytamy bajt o określonym
+indeksie, uzyskamy taką samą wartość jak przed konersją (jeśli indeks wciąż jest w zakresie).
 
 .. code-block:: solidity
 
     bytes2 a = 0x1234;
-    bytes4 b = bytes4(a); // b will be 0x12340000
+    bytes4 b = bytes4(a); // b będzie zawierać 0x12340000
     assert(a[0] == b[0]);
     assert(a[1] == b[1]);
 
-Since integers and fixed-size byte arrays behave differently when truncating or
-padding, explicit conversions between integers and fixed-size byte arrays are only allowed,
-if both have the same size. If you want to convert between integers and fixed-size byte arrays of
-different size, you have to use intermediate conversions that make the desired truncation and padding
-rules explicit:
+Ponieważ liczby całkowite i tablice bajtów o stałym rozmiarze zachowują się
+odmiennie podczas skracania lub rozszerzania, jawne konwersje między nimi są
+dozwolone tylko w sytuacji, kiedy oba mają ten sam rozmiar. Aby skonwertować
+typy między różniącymi się długością liczbami całkowitymi a tablicami bajtów
+o stałym rozmiarze, musisz dokonać pośrednich konwersji:
 
 .. code-block:: solidity
 
     bytes2 a = 0x1234;
-    uint32 b = uint16(a); // b will be 0x00001234
-    uint32 c = uint32(bytes4(a)); // c will be 0x12340000
-    uint8 d = uint8(uint16(a)); // d will be 0x34
-    uint8 e = uint8(bytes1(a)); // e will be 0x12
+    uint32 b = uint16(a); // b wyniesie 0x00001234
+    uint32 c = uint32(bytes4(a)); // c wyniesie 0x12340000
+    uint8 d = uint8(uint16(a)); // d wyniesie 0x34
+    uint8 e = uint8(bytes1(a)); // e wyniesie 0x12
 
-``bytes`` arrays and ``bytes`` calldata slices can be converted explicitly to fixed bytes types (``bytes1``/.../``bytes32``).
-In case the array is longer than the target fixed bytes type, truncation at the end will happen.
-If the array is shorter than the target type, it will be padded with zeros at the end.
+Tablice ``bajtów<bytes>`` i ``bajtowe<bytes>`` wycinki calldata można konwertować jawnie do typów bajtowycch o stałej długości (``bytes1``/.../``bytes32``).
+Jeśli tablica jest dłuższa od docelowego typu bajtowego o stałej długości, zostanie obcięta na końcu.
+Jeśli tablica jest krótsza od typu docelowego, zostanie na końcu dopełniona zerami.
 
 .. code-block:: solidity
 
@@ -122,72 +122,72 @@ If the array is shorter than the target type, it will be padded with zeros at th
         bytes s = "abcdefgh";
         function f(bytes calldata c, bytes memory m) public view returns (bytes16, bytes3) {
             require(c.length == 16, "");
-            bytes16 b = bytes16(m);  // if length of m is greater than 16, truncation will happen
-            b = bytes16(s);  // padded on the right, so result is "abcdefgh\0\0\0\0\0\0\0\0"
-            bytes3 b1 = bytes3(s); // truncated, b1 equals to "abc"
-            b = bytes16(c[:8]);  // also padded with zeros
+            bytes16 b = bytes16(m);  // jeśli m jest dłuższy od 16, zostanie obcięty
+            b = bytes16(s);  // dopełniony po prawej, wynik to "abcdefgh\0\0\0\0\0\0\0\0"
+            bytes3 b1 = bytes3(s); // obcięty, b1 to "abc"
+            b = bytes16(c[:8]);  // też dopełniony zerami
             return (b, b1);
         }
     }
 
 .. _types-conversion-literals:
 
-Conversions between Literals and Elementary Types
+Konwersje między literałami a typami podstawowymi
 =================================================
 
-Integer Types
--------------
+Typy całkowite
+--------------
 
-Decimal and hexadecimal number literals can be implicitly converted to any integer type
-that is large enough to represent it without truncation:
+Literały liczbowe dziesiętne i szestnastkowe mogą być niejawnie konwertowane do dowolnej
+liczby całkowitej, która jest wystarczająco duża, aby je reprezentować bez obcinania:
 
 .. code-block:: solidity
 
-    uint8 a = 12; // fine
-    uint32 b = 1234; // fine
-    uint16 c = 0x123456; // fails, since it would have to truncate to 0x3456
+    uint8 a = 12; // dobrze
+    uint32 b = 1234; // dobrze
+    uint16 c = 0x123456; // źle, ponieważ wartość zostałaby obcięta do 0x3456
 
 .. note::
-    Prior to version 0.8.0, any decimal or hexadecimal number literals could be explicitly
-    converted to an integer type. From 0.8.0, such explicit conversions are as strict as implicit
-    conversions, i.e., they are only allowed if the literal fits in the resulting range.
+    Do wersji 0.8.0 można było jawnie skonwertować dowolny literał liczbowy dziesiętny
+	lub szestnastkowy skonwertowany do typu całkowitego. Od 0.8.0 takie jawne konwersje 
+	są tak samo rygorystyczne jak niejawne konwersje, tzn. można ich dokonać tylko wtedy,
+	gdy literał mieści się w zakresie wynikowym.
 
-Fixed-Size Byte Arrays
-----------------------
+Tablice bajtów o stałej długości
+------------------------------
 
-Decimal number literals cannot be implicitly converted to fixed-size byte arrays. Hexadecimal
-number literals can be, but only if the number of hex digits exactly fits the size of the bytes
-type. As an exception both decimal and hexadecimal literals which have a value of zero can be
-converted to any fixed-size bytes type:
-
-.. code-block:: solidity
-
-    bytes2 a = 54321; // not allowed
-    bytes2 b = 0x12; // not allowed
-    bytes2 c = 0x123; // not allowed
-    bytes2 d = 0x1234; // fine
-    bytes2 e = 0x0012; // fine
-    bytes4 f = 0; // fine
-    bytes4 g = 0x0; // fine
-
-String literals and hex string literals can be implicitly converted to fixed-size byte arrays,
-if their number of characters matches the size of the bytes type:
+Literałów liczb dziesiętnych nie można niejawnie konwertować do tablic bajtów o stałej długości.
+Literały liczb szesnastkowych można w ten sposób konwertować, ale tylko wtedy, gdy ilość cyfr
+szestnastkowych zgadza się z rozmiarem typu tablicy bajtów. Istnieje wyjątek, że zarówno literały
+całkowite jak i szesnastkowe o wartości 0 można skonwertować do dowolnej tablicy bajtów o stałej długości:
 
 .. code-block:: solidity
 
-    bytes2 a = hex"1234"; // fine
-    bytes2 b = "xy"; // fine
-    bytes2 c = hex"12"; // not allowed
-    bytes2 d = hex"123"; // not allowed
-    bytes2 e = "x"; // not allowed
-    bytes2 f = "xyz"; // not allowed
+    bytes2 a = 54321; // niedozwolone
+    bytes2 b = 0x12; // niedozwolone
+    bytes2 c = 0x123; // niedozwolone
+    bytes2 d = 0x1234; // ok
+    bytes2 e = 0x0012; // ok
+    bytes4 f = 0; // ok
+    bytes4 g = 0x0; // ok
 
-Addresses
----------
+Literały tekstowe mogą być niejawnie konwertowane do tablic bajtów o stałej długości,
+jeżeli liczba znaków odpowiada długości tablicy:
 
-As described in :ref:`address_literals`, hex literals of the correct size that pass the checksum
-test are of ``address`` type. No other literals can be implicitly converted to the ``address`` type.
+.. code-block:: solidity
 
-Explicit conversions from ``bytes20`` or any integer type to ``address`` result in ``address payable``.
+    bytes2 a = hex"1234"; // ok
+    bytes2 b = "xy"; // ok
+    bytes2 c = hex"12"; // niedopuszczalne
+    bytes2 d = hex"123"; // niedopuszczalne
+    bytes2 e = "x"; // niedopuszczalne
+    bytes2 f = "xyz"; // niedopuszczalne
 
-An ``address a`` can be converted to ``address payable`` via ``payable(a)``.
+Adresy
+------
+
+Jak opisano w rozdziale :ref:`literały adresowe<address_literals>`, szestnastkowe literały o odpowieniej długości, które przechodzą test sumy kontrolnej, są typu ``address``. Innych literałów nie można niejawnie skonwertować do typu ``address``.
+
+Jawna konwersja ``bytes20`` lub dowolnej liczby całkowitej do ``address`` zwraca typ ``address payable``.
+
+``address a`` można skonwertować do ``address payable`` funkcją ``payable(a)``.

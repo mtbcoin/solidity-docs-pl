@@ -2,27 +2,25 @@
 
 .. _contract_structure:
 
-***********************
-Structure of a Contract
-***********************
+*******************
+Struktura kontraktu
+*******************
 
-Contracts in Solidity are similar to classes in object-oriented languages.
-Each contract can contain declarations of :ref:`structure-state-variables`, :ref:`structure-functions`,
-:ref:`structure-function-modifiers`, :ref:`structure-events`, :ref:`structure-errors`, :ref:`structure-struct-types` and :ref:`structure-enum-types`.
-Furthermore, contracts can inherit from other contracts.
+Kontrakty w Solidity są podobne do klas w językach obiektowych.
+Każdy kontrakt może zawierać deklaracje :ref:`structure-state-variables`, :ref:`structure-functions`,
+:ref:`structure-function-modifiers`, :ref:`structure-events`, :ref:`structure-errors`, :ref:`structure-struct-types` i :ref:`structure-enum-types`.
+Co więcej, kontrakty mogą dziedziczyć inne kontrakty.
 
-There are also special kinds of contracts called :ref:`libraries<libraries>` and :ref:`interfaces<interfaces>`.
+Są także specjalne typy kontraktów zwane :ref:`bibliotekami<libraries>` i :ref:`interfejsami<interfaces>`.
 
-The section about :ref:`contracts<contracts>` contains more details than this section,
-which serves to provide a quick overview.
+Więcej szczegółów znajdziesz w rozdziale :ref:`kontraktach<contracts>`.
 
 .. _structure-state-variables:
 
-State Variables
-===============
+Zmienne stanu
+=============
 
-State variables are variables whose values are permanently stored in contract
-storage.
+Zmienne stanu to zmienne, których wartości są na stałe przechowywane w pamięci kontraktu.
 
 .. code-block:: solidity
 
@@ -30,22 +28,20 @@ storage.
     pragma solidity >=0.4.0 <0.9.0;
 
     contract SimpleStorage {
-        uint storedData; // State variable
+        uint storedData; // Zmienna stanu
         // ...
     }
 
-See the :ref:`types` section for valid state variable types and
-:ref:`visibility-and-getters` for possible choices for
-visibility.
+Przeczytaj rozdział :ref:`types`, aby dowiedzieć się o typach zmiennych stanu,
+:ref:`widoczności i getterach<visibility-and-getters>`.
 
 .. _structure-functions:
 
-Functions
-=========
+Funkcje
+=======
 
-Functions are the executable units of code. Functions are usually
-defined inside a contract, but they can also be defined outside of
-contracts.
+Funkcje to wykonywalne jednostki kodu. Są zazwyczaj umieszczane wewnątrz
+kontraktu, ale można je także zdefiniować poza kontraktem.
 
 .. code-block:: solidity
 
@@ -53,7 +49,7 @@ contracts.
     pragma solidity >=0.7.1 <0.9.0;
 
     contract SimpleAuction {
-        function bid() public payable { // Function
+        function bid() public payable { // Funkcja
             // ...
         }
     }
@@ -63,23 +59,23 @@ contracts.
         return x * 2;
     }
 
-:ref:`function-calls` can happen internally or externally
-and have different levels of :ref:`visibility<visibility-and-getters>`
-towards other contracts. :ref:`Functions<functions>` accept :ref:`parameters and return variables<function-parameters-return-variables>` to pass parameters
-and values between them.
+:ref:`Wywołania funkcji<function-calls>` mogą być wewnętrzne lub zewnętrzne i mają
+różne poziomy :ref:`widoczności<visibility-and-getters>` dla innych kontraktów.
+:ref:`Funkcje<functions>` akceptują :ref:`parametry and zmienne wynikowe<function-parameters-return-variables>` do przekazywania parametrów
+i wartości między nimi.
 
 .. _structure-function-modifiers:
 
-Function Modifiers
-==================
+Modyfikatory funkcji
+====================
 
-Function modifiers can be used to amend the semantics of functions in a declarative way
-(see :ref:`modifiers` in the contracts section).
+Modyfikatorów funkcji używa się do zmiany semantyki funkcji w sposób deklaratywny
+(zobacz :ref:`modyfikatory<modifiers>` w rozdziale o kontraktach).
 
-Overloading, that is, having the same modifier name with different parameters,
-is not possible.
+Przeładowanie, czyli utworzenie tego samego modyfikatora z innymi+ parametrami,
+jest niemożliwe.
 
-Like functions, modifiers can be :ref:`overridden <modifier-overriding>`.
+Podobnie jak funkcje, modyfikatory można :ref:`nadpisać <modifier-overriding>`.
 
 .. code-block:: solidity
 
@@ -89,7 +85,7 @@ Like functions, modifiers can be :ref:`overridden <modifier-overriding>`.
     contract Purchase {
         address public seller;
 
-        modifier onlySeller() { // Modifier
+        modifier onlySeller() { // Modyfikator
             require(
                 msg.sender == seller,
                 "Only seller can call this."
@@ -97,17 +93,17 @@ Like functions, modifiers can be :ref:`overridden <modifier-overriding>`.
             _;
         }
 
-        function abort() public view onlySeller { // Modifier usage
+        function abort() public view onlySeller { // Użycie modyfikatora
             // ...
         }
     }
 
 .. _structure-events:
 
-Events
-======
+Zdarzenia
+=========
 
-Events are convenience interfaces with the EVM logging facilities.
+Zdarzenia to interfejsy udogodniające z funkcjonalnością logowania EVM.
 
 .. code-block:: solidity
 
@@ -115,35 +111,34 @@ Events are convenience interfaces with the EVM logging facilities.
     pragma solidity >=0.4.21 <0.9.0;
 
     contract SimpleAuction {
-        event HighestBidIncreased(address bidder, uint amount); // Event
+        event HighestBidIncreased(address bidder, uint amount); // Zdarzenie
 
         function bid() public payable {
             // ...
-            emit HighestBidIncreased(msg.sender, msg.value); // Triggering event
+            emit HighestBidIncreased(msg.sender, msg.value); // Wyzwolenie zdarzenia
         }
     }
 
-See :ref:`events` in contracts section for information on how events are declared
-and can be used from within a dapp.
+Zobacz :ref:`events` w sekcji o kontraktach, aby dowiedzieć się, jak deklarować
+zdarzenia i jak je wykorzystać wewnątrz zdecentralizowanej aplikacji.
 
 .. _structure-errors:
 
-Errors
-======
+Błędy
+=====
 
-Errors allow you to define descriptive names and data for failure situations.
-Errors can be used in :ref:`revert statements <revert-statement>`.
-In comparison to string descriptions, errors are much cheaper and allow you
-to encode additional data. You can use NatSpec to describe the error to
-the user.
+Błędy pozwalają zdefiniować opisowe nazwy i informacje dla niepowodzeń.
+Można ich używać w :ref:`instrukcjach revert <revert-statement>`.
+W odróżnieniu od opisów tekstowych, błędy są dużo tańsze i pozwalają
+zakodować dodatkowe informacje. Możesz użyć NatSpec, aby opisać błąd użytkownikowi.
 
 .. code-block:: solidity
 
     // SPDX-License-Identifier: GPL-3.0
     pragma solidity ^0.8.4;
 
-    /// Not enough funds for transfer. Requested `requested`,
-    /// but only `available` available.
+    /// Za mało środków, aby wykonać przelew. Zażądano `requested`,
+    /// ale tylko `available` jest dostępnych.
     error NotEnoughFunds(uint requested, uint available);
 
     contract Token {
@@ -158,15 +153,15 @@ the user.
         }
     }
 
-See :ref:`errors` in the contracts section for more information.
+Zobacz :ref:`błędy<errors>` w rozdziale o kontraktach, aby dowiedzieć się więcej.
 
 .. _structure-struct-types:
 
-Struct Types
-=============
+Struktury
+=========
 
-Structs are custom defined types that can group several variables (see
-:ref:`structs` in types section).
+Struktury to typy zdefiniowane przez użytkownika, które grupują różne
+zmienne (zobacz :ref:`struktury<structs>` w rozdziale o typach).
 
 .. code-block:: solidity
 
@@ -174,7 +169,7 @@ Structs are custom defined types that can group several variables (see
     pragma solidity >=0.4.0 <0.9.0;
 
     contract Ballot {
-        struct Voter { // Struct
+        struct Voter { // Struktura
             uint weight;
             bool voted;
             address delegate;
@@ -184,11 +179,11 @@ Structs are custom defined types that can group several variables (see
 
 .. _structure-enum-types:
 
-Enum Types
+Wyliczenia
 ==========
 
-Enums can be used to create custom types with a finite set of 'constant values' (see
-:ref:`enums` in types section).
+Wyliczenia to typy zdefiniowane przez użytkownika, które zawierają skońcony zbiór
+'stałych wartości' (zobacz :ref:`wyliczenia<enums>` w rozdziale o typach).
 
 .. code-block:: solidity
 
@@ -196,5 +191,5 @@ Enums can be used to create custom types with a finite set of 'constant values' 
     pragma solidity >=0.4.0 <0.9.0;
 
     contract Purchase {
-        enum State { Created, Locked, Inactive } // Enum
+        enum State { Created, Locked, Inactive } // Wyliczenie
     }
